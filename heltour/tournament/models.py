@@ -751,6 +751,7 @@ class Player(_BaseModel):
     account_status = models.CharField(default='normal', max_length=31,
                                       choices=ACCOUNT_STATUS_OPTIONS)
     oauth_token = models.ForeignKey(OauthToken, null=True, on_delete=models.CASCADE)
+    is_visible = models.BooleanField(default=True)
 
     profile = JSONField(blank=True, null=True)
 
@@ -770,6 +771,7 @@ class Player(_BaseModel):
         )
 
     def __init__(self, *args, **kwargs):
+        print([f.get_attname() for f in Player._meta.fields])
         super(Player, self).__init__(*args, **kwargs)
         self.initial_account_status = self.account_status
 
@@ -791,6 +793,16 @@ class Player(_BaseModel):
         is_booster = user_meta.get('booster', False)
         is_closed = user_meta.get('disabled', False)
         self.account_status = 'closed' if is_closed else 'engine' if is_engine else 'booster' if is_booster else 'normal'
+        self.save()
+        
+    def anonymize(self, new_name):
+        self.lichess_username = new_name
+        self.rating = 1000
+        self.email = ''
+        self.slack_user_id = ''
+        self.games_played = 0
+        self.is_active = False
+        self.is_visible = False
         self.save()
 
     @classmethod
