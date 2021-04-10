@@ -771,7 +771,6 @@ class Player(_BaseModel):
         )
 
     def __init__(self, *args, **kwargs):
-        print([f.get_attname() for f in Player._meta.fields])
         super(Player, self).__init__(*args, **kwargs)
         self.initial_account_status = self.account_status
 

@@ -1587,9 +1587,6 @@ class PlayerAdmin(_BaseAdmin):
         return self.has_assigned_perm(request.user, 'delete')
     
     def has_gdpr_permission(self, request, obj=None):
-        print(request.user)
-        for perm in request.user.get_all_permissions():
-            print(perm)
         return 'auth.delete_user' in request.user.get_all_permissions()
 
 
@@ -1617,20 +1614,23 @@ class PlayerAdmin(_BaseAdmin):
     # this should be restricted to users with auth.delete_user permissions, but I am not able to assign that.
     def gdpr_erasure_incl_registrations(self, request, queryset):
         if self.has_gdpr_permission(request):
-            print('has permissions')
-            #new_name = 'anonymous_'+''.join(random.choices(string.ascii_uppercase + string.digits, k=12))
-            #usernames = [p.lichess_username for p in queryset.all()]
-            #for username in usernames:
-            #    p = Player.objects.get(lichess_username__iexact=username)
-            #    p.anonymize(new_name)
-           # 
-            #    for reg in Registration.objects.filter(lichess_username__iexact=username):
-            #        reg.delete()
-           # 
-            #    u = User.objects.get(username__iexact=username)
-            #    u.delete()
+            new_name = 'anonymous_'+''.join(random.choices(string.ascii_uppercase + string.digits, k=12))
+            usernames = [p.lichess_username for p in queryset.all()]
+            for username in usernames:
+                p = Player.objects.get(lichess_username__iexact=username)
+                p.anonymize(new_name)
+            
+                for reg in Registration.objects.filter(lichess_username__iexact=username):
+                    reg.delete()
+            
+                try:
+                    u = User.objects.get(username__iexact=username)
+                    u.delete()
+                except:
+                    #do nothing, user does not exist.
+                    continue
         
-            #self.message_user(request, 'User anonymized', messages.INFO)
+            self.message_user(request, 'User anonymized', messages.INFO)
         else:
             self.message_user(request, 'Insufficient privileges', messages.ERROR)
 

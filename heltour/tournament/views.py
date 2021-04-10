@@ -1643,6 +1643,7 @@ class PlayerProfileView(LeagueView):
             'career_score': career_score,
             'career_score_total': career_score_total,
             'can_edit': self.request.user.has_perm('tournament.change_season_player', self.league),
+            'is_visible' : player.is_visible,
             'trophies': trophies
         }
         return self.render('tournament/player_profile.html', context)
