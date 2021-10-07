@@ -730,8 +730,8 @@ username_validator = RegexValidator('^[\w-]+$')
 
 ACCOUNT_STATUS_OPTIONS = (
     ('normal', 'Normal'),
+    ('tos_violation', 'ToS Violation'),
     ('engine', 'Engine'),
-    ('booster', 'Booster'),
     ('closed', 'Closed'),
 )
 
@@ -787,14 +787,17 @@ class Player(_BaseModel):
 
     def update_profile(self, user_meta):
         self.profile = user_meta
-        classical = user_meta['perfs'].get('classical')
-        if classical is not None:
+        try:
+            #for closed accounts we do not get 'perfs' anymore and this fails.
+            classical = user_meta['perfs'].get('classical')
+        except:
+            classical = 0
+        if classical is not None and classical > 0:
             self.rating = classical['rating']
             self.games_played = classical['games']
-        is_engine = user_meta.get('engine', False)
-        is_booster = user_meta.get('booster', False)
         is_closed = user_meta.get('disabled', False)
-        self.account_status = 'closed' if is_closed else 'engine' if is_engine else 'booster' if is_booster else 'normal'
+        is_tosViolation = user_meta.get('tosViolation', False)
+        self.account_status = 'closed' if is_closed else 'tos_violation' if is_tosViolation else 'normal'
         self.save()
 
     @classmethod
