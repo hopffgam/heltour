@@ -731,7 +731,6 @@ username_validator = RegexValidator('^[\w-]+$')
 ACCOUNT_STATUS_OPTIONS = (
     ('normal', 'Normal'),
     ('tos_violation', 'ToS Violation'),
-    ('engine', 'Engine'),
     ('closed', 'Closed'),
 )
 
