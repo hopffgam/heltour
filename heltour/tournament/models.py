@@ -787,13 +787,14 @@ class Player(_BaseModel):
     def update_profile(self, user_meta):
         self.profile = user_meta
         try:
-            #for closed accounts we do not get 'perfs' anymore and this fails.
             classical = user_meta['perfs'].get('classical')
+            if classical is not None:
+                self.rating = classical['rating']
+                self.games_played = classical['games']
         except:
-            classical = 0
-        if classical is not None and classical > 0:
-            self.rating = classical['rating']
-            self.games_played = classical['games']
+            #just do nothing if reading 'perfs' fails
+            pass
+        
         is_closed = user_meta.get('disabled', False)
         is_tosViolation = user_meta.get('tosViolation', False)
         self.account_status = 'closed' if is_closed else 'tos_violation' if is_tosViolation else 'normal'
