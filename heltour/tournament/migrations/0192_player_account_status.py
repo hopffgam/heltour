@@ -6,8 +6,6 @@ from django.db import migrations, models
 class Migration(migrations.Migration):
     
     def update_player_status(apps, schema_editor):
-        # We can't import the Person model directly as it may be a newer
-        # version than this migration expects. We use the historical version.
         Players = apps.get_model('tournament', 'Player')
         for player in Players.objects.all():
             if player.account_status in ('engine','booster'):
